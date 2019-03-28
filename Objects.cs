@@ -64,15 +64,14 @@ namespace JavaDeObfuscator
 			bad_names.Add("goto");
 			bad_names.Add("try");
 			bad_names.Add("null");
+            bad_names.Add("if");
+            bad_names.Add("this");
 
 			Name = Common.GetClassName(Name);
 
 
 			if (Name[0] == '<')
 				return false;
-
-			if (Name.Length > 0 && Name.Length <= 2)
-				return true;
 
 			if (Name.Length > 0 && Name.Length <= 3 && Name.Contains("$"))
 				return true;
@@ -125,15 +124,7 @@ namespace JavaDeObfuscator
 			{
 				string NewClassName;
 
-				if (UseUniqueNums)
-				{
-					string format = "{0:D" + (FClassFiles.Count.ToString().Length + 2) + "}";
-					string uniqueNum = string.Format(format, Convert.ToInt64(ClassFile.ThisClassCode.ToString() + index.ToString()));
-
-					NewClassName = String.Format("Class_{0}_{1}", Common.GetClassName(OriginalClassName), uniqueNum);
-				}
-				else
-					NewClassName = String.Format("Class_{0}", Common.GetClassName(OriginalClassName));
+                NewClassName = ClassFile.FileName;
 
 				// test if the filename we are changing to hasnt already been used!
 				while (ClassNameExists(NewClassName))
@@ -158,13 +149,6 @@ namespace JavaDeObfuscator
 					TMethodChangeRecord mcr = new TMethodChangeRecord(mi);
 					// rename all of the functions something meaningful
 					string NewName;
-					// if the offset is zero, it probably means its an abstract method
-					if (ClassFile.AccessFlags == AccessFlags.ACC_INTERFACE)
-						NewName = String.Format("sub_iface_{0:x}", i);
-					else if (mi.Offset != 0)
-						NewName = String.Format("sub_{0:x}", mi.Offset);
-					else
-						NewName = String.Format("sub_null_{0:x}", i);
 
 					/*if (FThoroughMode)
 					{
@@ -182,6 +166,10 @@ namespace JavaDeObfuscator
 					{
 						NewName = rd.FieldName;
 					}
+                    else
+                    {
+                        NewName = mi.Name.Value;
+                    }
 
 					// change the method name
 					ClassFile.ChangeMethodName(i, NewName);
@@ -206,12 +194,6 @@ namespace JavaDeObfuscator
 					TFieldChangeRecord fcr = new TFieldChangeRecord(fi);
 					// rename all of the fields something meaningful
 					string NewName;
-					// if the offset is zero, it probably means its a null/abstract method
-					if (fi.Offset != 0)
-						NewName = String.Format("var_{0:x}", fi.Offset);
-					else
-						NewName = String.Format("var_null_{0:x}", fi.Offset);
-
 					/*if (FThoroughMode)
 					{
 						int j = 0;
@@ -227,6 +209,10 @@ namespace JavaDeObfuscator
 					{
 						NewName = rd.FieldName;
 					}
+                    else
+                    {
+                        NewName = fi.Name.Value;
+                    }
 
 					ClassFile.ChangeFieldName(i, NewName);
 
@@ -574,8 +560,6 @@ namespace JavaDeObfuscator
 			ArrayList NewFileNameList = new ArrayList();
 			int curr_progress = 0;
 
-			Progress(0);
-
 			// open each class file and add to array
 			foreach (string fn in FFiles)
 			{
@@ -586,8 +570,6 @@ namespace JavaDeObfuscator
 					if (cf.Open())
 					{
 						FClassFiles.Add(cf);
-
-						Progress(++curr_progress);
 					}
 				}
 			}
@@ -605,12 +587,7 @@ namespace JavaDeObfuscator
 				// note: this duplications of data fixes problems with inheritance
 				//
 				MasterChangeList.Add(DeObfuscateSingleFile(i, RenameStore));
-
-				Progress(i + 1);
 			}
-
-			Progress(0);
-			curr_progress = 0;
 
 			// iterate through all the class files using the change records saved
 			// after the deobfuscation was done
@@ -658,8 +635,6 @@ namespace JavaDeObfuscator
 
 				// return the new filename so the main gui knows what to reload
 				NewFileNameList.Add(file_name);
-
-				Progress(++curr_progress);
 			}
 
 			return NewFileNameList;

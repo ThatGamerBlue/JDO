@@ -4,6 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace JavaDeObfuscator
 {
@@ -12,6 +13,7 @@ namespace JavaDeObfuscator
 		TDeObfuscator DeObfuscator = null;
 		ArrayList Files = null;
 		RenameDatabase RenameStore = null;
+        ArrayList classList = new ArrayList();
 
 		private Label label1;
 		private OpenFileDialog OpenFileDialog;
@@ -29,29 +31,42 @@ namespace JavaDeObfuscator
 		private FolderBrowserDialog dlgOutput;
 		private CheckBox chkUseUniqueNums;
 		private IContainer components;
+        private string[] argv;
 
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
-		[STAThread]
-		static void Main()
+        private const UInt32 StdOutputHandle = 0xFFFFFFF5;
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetStdHandle(UInt32 nStdHandle);
+        [DllImport("kernel32.dll")]
+        private static extern void SetStdHandle(UInt32 nStdHandle, IntPtr handle);
+
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+		static void Main(string[] args)
 		{
+            WinConsole.Initialize();
+            Console.WriteLine("test");
 			Application.EnableVisualStyles();
-			Application.Run(new MainForm());
+			Application.Run(new MainForm(args));
 		}
 
 
-		public MainForm()
+		public MainForm(string[] args)
 		{
 			//
 			// Required for Windows Form Designer support
 			//
 			InitializeComponent();
 
-			//
-			// TODO: Add any constructor code after InitializeComponent call
-			//
-		}
+            //
+            // TODO: Add any constructor code after InitializeComponent call
+            //
+            this.argv = args;
+        }
 
 		/// <summary>
 		/// Clean up any resources being used.
@@ -440,7 +455,8 @@ namespace JavaDeObfuscator
 
 			if (!Directory.Exists(txtOutput.Text))
 			{
-				MessageBox.Show("Output dir doesn't exists!", "Output", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //MessageBox.Show("Output dir doesn't exists!", "Output", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Directory.CreateDirectory(txtOutput.Text);
 				return;
 			}
 
@@ -451,11 +467,6 @@ namespace JavaDeObfuscator
 			DeObfuscator.OutputDir = txtOutput.Text;
 			DeObfuscator.UseUniqueNums = chkUseUniqueNums.Checked;
 
-			Progress.Maximum = Files.Count;
-			Progress.Visible = true;
-
-			TDeObfuscator.Progress += new TDeObfuscator.ProgressHandler(OnProgress);
-
 			// update the classfile with the new deobfuscated version
 			ArrayList NewFileList = DeObfuscator.DeObfuscateAll(RenameStore);
 			if (NewFileList != null)
@@ -465,8 +476,7 @@ namespace JavaDeObfuscator
 			}
 			else
 				MessageBox.Show("Error!!!", "DeObfuscator");
-
-			Progress.Visible = false;
+            
 			RenameStore = new RenameDatabase();
 			UpdateTree();
 		}
@@ -570,7 +580,48 @@ namespace JavaDeObfuscator
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			RenameStore = new RenameDatabase();
-		}
+
+            if (argv.Length != 2)
+            {
+                System.Diagnostics.Process.GetCurrentProcess().Kill();
+            }
+            else
+            {
+                Console.WriteLine("Input: "+argv[0]);
+                Console.WriteLine("Output: "+argv[1]);
+            }
+
+            if (Files == null)
+                Files = new ArrayList();
+
+            string[] fileList = Directory.GetFiles(argv[0], "*.class");
+
+            foreach (string fn in fileList)
+            {
+                string cn = fn.Split('\\')[fn.Split('\\').Length - 1];
+                if (cn.Length > 8)
+                {
+                    Console.WriteLine("Ignoring: " + fn);
+                }
+                else
+                {
+                    classList.Add(fn);
+                    Console.WriteLine("Adding: " + fn);
+                    Files.Add(fn);
+                }
+            }
+
+            JSONHandler.ParseTheJson(argv, classList, RenameStore);
+
+            txtOutput.Text = argv[1];
+
+            Console.WriteLine(RenameStore.GetClassAmount());
+
+            UpdateTree();
+
+            ProcessButton_Click(null, null);
+
+        }
 
 		private void btnOutput_Click(object sender, EventArgs e)
 		{
