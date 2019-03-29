@@ -471,11 +471,11 @@ namespace JavaDeObfuscator
 			ArrayList NewFileList = DeObfuscator.DeObfuscateAll(RenameStore);
 			if (NewFileList != null)
 			{
-				MessageBox.Show("DeObfuscated everything ok!", "DeObfuscator");
+				//MessageBox.Show("DeObfuscated everything ok!", "DeObfuscator");
 				Files = NewFileList;
 			}
 			else
-				MessageBox.Show("Error!!!", "DeObfuscator");
+				MessageBox.Show("Error!!!", "Deobfuscator Stage Two");
             
 			RenameStore = new RenameDatabase();
 			UpdateTree();
@@ -599,7 +599,7 @@ namespace JavaDeObfuscator
             foreach (string fn in fileList)
             {
                 string cn = fn.Split('\\')[fn.Split('\\').Length - 1];
-                if (cn.Length > 8)
+                if (cn.Length > 8 && cn != "client.class")
                 {
                     Console.WriteLine("Ignoring: " + fn);
                 }
@@ -620,6 +620,8 @@ namespace JavaDeObfuscator
             UpdateTree();
 
             ProcessButton_Click(null, null);
+
+            Environment.Exit(0);
 
         }
 

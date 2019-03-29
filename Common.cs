@@ -1781,14 +1781,14 @@ namespace JavaDeObfuscator
         }
         public void AddRenameMethod(string ClassName, string OldDescriptor, string OldName, string NewDescriptor, string NewName)
         {
-            Console.WriteLine("AddRenameMethod(" + ClassName+", "+OldDescriptor+", "+OldName+", "+NewDescriptor+", "+NewName+")");
-            Console.WriteLine(new StackFrame(1).GetMethod().Name);
+            //Console.WriteLine("AddRenameMethod(" + ClassName+", "+OldDescriptor+", "+OldName+", "+NewDescriptor+", "+NewName+")");
+            //Console.WriteLine(new StackFrame(1).GetMethod().Name);
             AddRename(FRenameMethods, ClassName, OldDescriptor, OldName, NewDescriptor, NewName);
         }
         public void AddRenameField(string ClassName, string OldDescriptor, string OldName, string NewDescriptor, string NewName)
         {
             Console.WriteLine("AddRenameField(" + ClassName + ", " + OldDescriptor + ", " + OldName + ", " + NewDescriptor + ", " + NewName + ")");
-            Console.WriteLine(new StackFrame(1).GetMethod().Name);
+            //Console.WriteLine(new StackFrame(1).GetMethod().Name);
             AddRename(FRenameFields, ClassName, OldDescriptor, OldName, NewDescriptor, NewName);
         }
         public RenameData GetNewMethodInfo(string ClassName, string OldDescriptor, string OldName)
@@ -1803,8 +1803,8 @@ namespace JavaDeObfuscator
         }
         public void AddRenameClass(string OldClassName, string NewClassName)
         {
-            Console.WriteLine("AddRenameClass(" + OldClassName + ", " + NewClassName + ")");
-            Console.WriteLine(new StackFrame(1).GetMethod().Name);
+            //Console.WriteLine("AddRenameClass(" + OldClassName + ", " + NewClassName + ")");
+            //Console.WriteLine(new StackFrame(1).GetMethod().Name);
             FRenameClass[OldClassName] = NewClassName;
         }
         public string GetNewClassName(string OldClassName)
