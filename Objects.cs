@@ -150,17 +150,6 @@ namespace JavaDeObfuscator
 					// rename all of the functions something meaningful
 					string NewName;
 
-					/*if (FThoroughMode)
-					{
-						int j = 0;
-						while (ClassFile.Methods.MethodNameExists(NewName))
-						{
-							// rename the method
-							NewName = NewName + "_" + j;
-							j++;
-						}
-					}*/
-
 					// user supplied names take precedence
 					if (rd != null)
 					{

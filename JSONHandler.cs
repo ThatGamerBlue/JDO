@@ -31,11 +31,19 @@ namespace JavaDeObfuscator
                 {
                     renameStore.AddRenameClass(className.Replace(".class", "") + " : " + clazz.Superclass, clazz.Name + " : " + clazz.Superclass);
                 }
+                else
+                {
+                    renameStore.AddRenameClass(className.Replace(".class", "") + " : " + clazz.Superclass, "___"+clazz.Name + " : " + clazz.Superclass);
+                }
                 foreach(ObfuscatedMethod method in clazz.Methods)
                 {
                     if (method.OldName != method.NewName)
                     {
                         renameStore.AddRenameMethod(method.ParentClass, method.Signature, method.OldName, method.Signature, method.NewName);
+                    }
+                    else if (!method.OldName.Contains("<") && (!method.OldName.Equals("init")))
+                    {
+                        renameStore.AddRenameMethod(method.ParentClass, method.Signature, method.OldName, method.Signature, "___"+method.NewName);
                     }
                 }
                 foreach(ObfuscatedField field in clazz.Fields)
@@ -43,6 +51,10 @@ namespace JavaDeObfuscator
                     if (field.OldName != field.NewName)
                     {
                         renameStore.AddRenameField(field.ParentClass, field.Signature, field.OldName, field.Signature, field.NewName);
+                    }
+                    else if(!field.OldName.Contains("this$0"))
+                    {
+                        renameStore.AddRenameField(field.ParentClass, field.Signature, field.OldName, field.Signature, "___"+field.NewName);
                     }
                 }
             }

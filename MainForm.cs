@@ -581,14 +581,14 @@ namespace JavaDeObfuscator
 		{
 			RenameStore = new RenameDatabase();
 
-            if (argv.Length != 2)
+            if (argv.Length == 2)
             {
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
+                Console.WriteLine("Input: " + argv[0]);
+                Console.WriteLine("Output: " + argv[1]);
             }
             else
             {
-                Console.WriteLine("Input: "+argv[0]);
-                Console.WriteLine("Output: "+argv[1]);
+                return;
             }
 
             if (Files == null)
@@ -612,6 +612,10 @@ namespace JavaDeObfuscator
             }
 
             JSONHandler.ParseTheJson(argv, classList, RenameStore);
+
+            string[] filePaths = Directory.GetFiles(argv[1]);
+            foreach (string filePath in filePaths)
+                File.Delete(filePath);
 
             txtOutput.Text = argv[1];
 
