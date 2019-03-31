@@ -1787,7 +1787,7 @@ namespace JavaDeObfuscator
         }
         public void AddRenameField(string ClassName, string OldDescriptor, string OldName, string NewDescriptor, string NewName)
         {
-            Console.WriteLine("AddRenameField(" + ClassName + ", " + OldDescriptor + ", " + OldName + ", " + NewDescriptor + ", " + NewName + ")");
+            //Console.WriteLine("AddRenameField(" + ClassName + ", " + OldDescriptor + ", " + OldName + ", " + NewDescriptor + ", " + NewName + ")");
             //Console.WriteLine(new StackFrame(1).GetMethod().Name);
             AddRename(FRenameFields, ClassName, OldDescriptor, OldName, NewDescriptor, NewName);
         }

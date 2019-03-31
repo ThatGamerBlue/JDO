@@ -613,6 +613,8 @@ namespace JavaDeObfuscator
 
             JSONHandler.ParseTheJson(argv, classList, RenameStore);
 
+            Directory.CreateDirectory(argv[1]);
+
             string[] filePaths = Directory.GetFiles(argv[1]);
             foreach (string filePath in filePaths)
                 File.Delete(filePath);
