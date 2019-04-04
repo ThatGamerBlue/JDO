@@ -162,13 +162,6 @@ namespace JavaDeObfuscator
                         NewName = mi.Name.Value;
                     }
 
-                    if(NewName.StartsWith("1protect$"))
-                    {
-                        Console.WriteLine(NewName);
-                    }
-
-                    NewName = NewName.Replace("1protect$", "");
-
                     // change the method name
                     ClassFile.ChangeMethodName(i, NewName);
 					// set the 
