@@ -55,7 +55,6 @@ namespace JavaDeObfuscator
 			bad_names.Add("char");
 			bad_names.Add("void");
 			bad_names.Add("byte");
-			bad_names.Add("do");
 			bad_names.Add("int");
 			bad_names.Add("long");
 			bad_names.Add("else");
@@ -64,10 +63,10 @@ namespace JavaDeObfuscator
 			bad_names.Add("goto");
 			bad_names.Add("try");
 			bad_names.Add("null");
-            bad_names.Add("if");
             bad_names.Add("this");
 
 			Name = Common.GetClassName(Name);
+
 
 
 			if (Name[0] == '<')
@@ -76,7 +75,10 @@ namespace JavaDeObfuscator
 			if (Name.Length > 0 && Name.Length <= 3 && Name.Contains("$"))
 				return true;
 
-			foreach (string s in bad_names)
+            if (Name.Contains("1protect$"))
+                return true;
+
+            foreach (string s in bad_names)
 			{
 				if (s == Name)
 					return true;
@@ -160,8 +162,15 @@ namespace JavaDeObfuscator
                         NewName = mi.Name.Value;
                     }
 
-					// change the method name
-					ClassFile.ChangeMethodName(i, NewName);
+                    if(NewName.StartsWith("1protect$"))
+                    {
+                        Console.WriteLine(NewName);
+                    }
+
+                    NewName = NewName.Replace("1protect$", "");
+
+                    // change the method name
+                    ClassFile.ChangeMethodName(i, NewName);
 					// set the 
 					mcr.ChangedTo(mi);
 					FChangeList.Add(mcr);
